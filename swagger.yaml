@@ -1,0 +1,144 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: zufallsgeneratorsw
+  description: erstes projekt
+schemes:
+- "http"
+- "https"
+produces:
+- "application/json"
+- "text/html"
+securityDefinitions:
+  user:
+    type: basic
+security: 
+ - user: []
+
+paths:
+  /quotes/random:
+    get:
+      tags:
+        - "quote"
+      operationId: "randomQuote"
+      summary: "Show a random quote"
+      responses:
+        "200":
+          description:  get a random quote
+
+  /quotes/random/{amount}:
+    get:
+      tags:
+        - "quote"
+      operationId: "randomQuotes"
+      summary: "Show a specific amount of quotes"
+      parameters:
+      - name: "amount"
+        required: true
+        in: "path"
+        type: integer
+      responses:
+        "200":
+          description:  get an amount of quotes
+
+  /quotes:
+    get:
+      tags:
+        - "quote"
+      operationId: "allQuotes"
+      summary: "Show all quotes"
+      responses:
+        "200":
+          description: get all quotes
+
+  /quotes/author/{name}:
+    get:
+      tags:
+        - "quote"
+      operationId: "author"
+      summary: "Show quotes from a specific author"
+      parameters:
+      - name: "name"
+        required: true
+        in: "path"
+        type: "string"
+      responses:
+        "200":
+          description: get all quotes from the author
+
+  /quotes/addNew/{showNewQuote}/{authorFullName}/{newCategory}:
+    post:
+      tags:
+        - "quote"
+      operationId: "addNewQuote"
+      summary: "add a new quote"
+      parameters:
+      - in: "body"
+        name: "cite"
+        required: true
+        schema:
+          $ref: "#/definitions/obj"
+      responses:
+        "200":
+          description:  add a new quote
+
+  /quotes/change/{key}/{newQuote}/{author}/{newCategory}:
+    put:
+      tags:
+        - "quote"
+      description: "change an existing quote depending on the RowKey"
+      operationId: changeQuoute
+      summary: "Change a quote depending on an existing key"
+      parameters:
+        - in: body
+          name: change
+          required: true
+          schema:
+            $ref: "#/definitions/change"
+      responses:
+        "200":
+          description: Change a quote depending on its key
+
+  /quotes/delete/{key}:
+    delete:
+      tags:
+        - "quote"
+      operationId: "deleteQuote"
+      summary: "Delete a quote depending on its key"
+      parameters:
+      - name: "key"
+        required: true
+        in: "path"
+        type: "integer"
+      responses:
+        "200":
+          description:  delete a quote depending on its key   
+
+definitions:
+  change:
+    type: object
+    properties:
+      key:
+        type: "string"
+        example: "10"
+      newQuote:
+        type: "string"
+        example: "Haben gespielt wie Flasche voll"
+      author:
+        type: "string"
+        example: "Trappatoni"
+      newCategory:
+        type: "string"
+        example: "englishSoccer"
+  obj:
+    type: object
+    properties: 
+      cite:
+        type: "string"
+        example: "Haben gespielt wie Flasche leer"
+      author:
+        type: "string"
+        example: "Trappatoni"
+      category:
+        type: "string"
+        example: "GermanSoccer"

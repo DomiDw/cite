@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Zitate für den Vertrieb</title>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-flat.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <style type="text/css">
+        html {
+            font-size: 16px;
+        }
+        body {
+            text-align: center;
+            background: url("https://cutewallpaper.org/21/the-matrix-wall-paper/Matrix-digital-rain,-binary,-code,-Matrix,-hacking-HD-.jpg")no-repeat fixed center;
+            background-size: cover;
+            font-size: 1em;
+        }
+        span {
+        text-decoration:underline;
+        color:blue;
+        cursor:pointer;
+        }
+        #descriptionBar {
+            text-decoration: underline;
+        }
+
+        #mainTable {
+            margin-top: 1%;
+            background:white;
+            width:70%;
+            color: black;
+        }
+        .fa-plus:hover {
+            color: green !important;
+        }
+        .fa-trash:hover {
+            color: red !important;
+        }
+        .fa-edit:hover {
+            color: blue !important;
+        }
+        .fa-check:hover {
+            color: green !important;
+        }
+        .fa-long-arrow-alt-left:hover {
+            color: red !important;
+        }
+        .fa-search:hover {
+            color: green !important;
+        }
+
+        .w3-btn,
+        .w3-button {
+            vertical-align: unset !important;
+        }
+
+        .w3-black,
+        .w3-hover-black:hover {
+            color: #fff !important;
+            background-color: #293650 !important;
+        }
+
+        #showRandomQuote {
+            margin-top: 5px;
+        }
+
+        #showAllQuotes {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #showCountQuotes,
+        #showAuthor,
+        #showNewQuote,
+        #changedQuote,
+        #deletedQuote,
+        button {
+            margin-top: 10px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #2c3e50;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        #defineCountQuotes {
+            width: 40px;
+            margin-right: 5px;
+        }
+
+        #quoteRowKey,
+        #quoteLength {
+            width: 78px;
+            margin-right: 5px;
+        }
+
+        #firstName,
+        #lastName,
+        #authorFirstName,
+        #authorLastName,
+        #changeFirstName,
+        #changeLastName {
+            width: 200px;
+            margin-right: 5px;
+        }
+
+        #newQuote,
+        #changeQuote {
+            width: 200px;
+            margin-right: 5px;
+        }
+
+        #newPartitionKey, #changeCategory {
+            padding: 3px 0;
+            border: 1px solid #ccc;
+        }
+        i {
+            font-size: 1.5em;
+        }
+    </style>
+
+    <script src="https://kit.fontawesome.com/606faa0769.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        let tableString = "<table id='mainTable' align=\"center\">"
+                        + "<tr id='descriptionBar'><th colspan='6' style=\"text-align:left\">Suchfunktion</th></tr>"
+                        + "<tr><td><input type='text' style=\"width:600px\" id='searchQuote' placeholder='Nach Zitat suchen'</td>"
+                        + "<i class='fas fa-search' style=\"padding-left: 5px;\" id='quoteSearchButton' onClick=''</i>"
+                        + "<td colspan='5'><input type='text' id='searchAuthor' placeholder='Nach Autor suchen'</td>"
+                        + "<i class='fas fa-search' style=\"padding-left: 5px;\" id='authorSearchButton' onClick='author()'</i>"
+                        + "<tr id='descriptionBar'><th colspan='6' style=\"text-align:left\">Zitat hinzufügen (Datum generiert sich automatisch)</th></tr>"
+                        + "<tr><td><input type='text' style=\"width:600px\" id='newQuote' placeholder='Gewünschtes Zitat'"
+                        + "<tr><td><input type='text' id='newAuthor' placeholder='Gewünschter Autor'</td>"
+                        + "<td><select id='newPartitionKey'><option value='' disabled selected>Kategorie auswählen</option>"
+                        + "<option value='GermanSoccer'>German Soccer</option><option value='EnglishSoccer'>English Soccer</option></select></td>"
+                        + "<td colspan='3' style=\'text-align:center\'><i class='fas fa-plus' id='saveNewQuote' onClick='addNewQuote()'></i></td>"
+                        + "<tr id='descriptionBar'><th>Zitat</th><th>Autor</th><th>Kategorie</th><th colspan='3'>Datum</th></tr>"
+    
+        function showHideQuotes() {
+            fetch('/quotes').then(response => {
+                return response.json()
+            }).then(obj => {
+                for (let i = 0; i < obj.length; i++) {
+                    let tableStringDelEdit  ="<tr><td>" + obj[i].cite + "</td><td>" + obj[i].author + "</td><td>" + obj[i].PartitionKey + "</td><td>" + new Date(obj[i].Timestamp).toDateString() 
+                                            +"</td><td>" + "<i class='fas fa-trash' id='delButton"+ i +"'></i>" 
+                                            +"</td><td>" + "<i class='fas fa-edit' id='changeButton"+ i +"'></i>"
+                                            + "</td></tr>";
+                    tableString += tableStringDelEdit
+                }
+                tableString += "</table>"
+                document.getElementById("showAll").innerHTML = tableString
+
+                for (let i = 0; i < obj.length; i++) {
+                    document.getElementById('changeButton'+i).onclick = function() {
+                        changeStep(obj[i])
+                    }
+                }
+                for (let i = 0; i < obj.length; i++) {
+                    document.getElementById('delButton'+i).onclick = function() {
+                        deleteQuote(obj[i])
+                    }
+                }
+            }).catch(err => {
+                console.error(err)
+            })
+        }
+
+        function changeStep(obj) {
+                let tableString = "<table id='mainTable' align=\"center\">"
+                                + "<tr id='descriptionBar'><th>Zitat</th><th>Autor</th><th colspan='3'>Kategorie</th></tr>"
+
+                    tableString +="<tr><td><input type='text' style=\"width:820px\" value='"+ obj.cite +"' id='updateQuote'></td>"
+                                +"<td><input type='text' value='"+ obj.author +"' id='updateAuthor'></td>"
+                                +"<td><select id='updateCategory' name='updateCategory'><option>"+ obj.PartitionKey +"</option>"
+                                    if (obj.PartitionKey === 'GermanSoccer'){
+                                        tableString += "<option value='EnglishSoccer'>EnglishSoccer</option></select>"
+                                    } else {
+                                        tableString += "<option value='GermanSoccer'>GermanSoccer</option>"
+                                    }
+                    tableString +="<td><i class='fas fa-check' id='saveButton'></i></td>" 
+                                +"<td><i class='fas fa-long-arrow-alt-left' onClick='showHideQuotes()'></i></td></tr></table>"
+
+                document.getElementById("showAll").innerHTML = tableString
+
+                document.getElementById('saveButton').onclick = function() {
+                    const showNewQuote = document.getElementById('updateQuote').value
+                    const showNewAuthor = document.getElementById('updateAuthor').value
+                    const showNewPartitionKey = document.getElementById('updateCategory').value
+
+                    if (showNewQuote !== "" && showNewAuthor !== "" && showNewPartitionKey !== "") {
+                        fetch('/quotes/change/' + obj.RowKey + '/' + showNewQuote + '/' + showNewAuthor + '/' + showNewPartitionKey, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded ' },
+                            body: 'key=' + obj.RowKey + '&newQuote=' + showNewQuote + '&author=' + showNewAuthor + '&newPartitionKey=' + showNewPartitionKey
+                        }).then(response => {
+                            Swal.fire({
+                                icon:'success',
+                                title: 'Das Zitat wurde erfolgreich überarbeitet',
+                        })
+                        }).catch(err => {
+                            console.error(err);
+                        })
+                    } else {
+                        Swal.fire({
+                            icon:'error',
+                            title: 'Fehler',
+                            text: 'Bitte alle Felder korrekt ausfüllen.'
+                        })
+                        return
+                    }
+                    showHideQuotes()
+                }
+        }
+
+        function author(obj) {
+            const fullName = document.getElementById('searchAuthor').value
+            if (fullName !== "") {
+                fetch('/quotes/author/' + fullName)
+                    .then(response => {
+                        return response.json()
+                    }).then(obj => {
+                        let tableString = "<table id='mainTable' align=\"center\">"
+                                        + "<tr id='descriptionBar'><th>Zitat</th><th>Autor</th><th>Kategorie</th><th><i class='fas fa-long-arrow-alt-left' onClick='showHideQuotes()'></i></th></tr>"
+                        for (let i = 0; i < obj.length; i++) {
+                            tableString += "</td><td>" + obj[i].cite + "</td><td>" + obj[i].author + "</td><td>" + obj[i].PartitionKey  + "</td><td>" + new Date(obj[i].Timestamp).toDateString() + "</td></tr>";
+                        }
+                        
+                        tableString += "</table>"
+
+                        document.getElementById("showAll").innerHTML = tableString
+                    }).catch(err => {
+                        console.error(err)
+                    })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title: 'Bitte tragen Sie einen vollständigen Namen ein.'
+                })
+            }
+        }
+
+        function addNewQuote(obj) {
+            const showNewQuote = document.getElementById('newQuote').value
+            const showNewAuthor = document.getElementById('newAuthor').value
+            const showNewPartitionKey = document.getElementById('newPartitionKey').value
+
+            if (showNewQuote !== "" && showNewAuthor !== "" && showNewPartitionKey !== "") {
+                fetch('/quotes/addNew/' + showNewQuote + '/' + showNewAuthor + '/' + showNewPartitionKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded ' },
+                    body: 'cite=' + showNewQuote + '&author=' + showNewAuthor + '&PartitionKey=' + showNewPartitionKey
+                }).then(response => {
+                    Swal.fire({
+                        icon:'success',
+                        title: 'Das Zitat wurde erfolgreich hinzugefügt.'
+                    })
+                }).catch(err => {
+                    console.error(err);
+                })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title: 'Fehler',
+                    text: 'Bitte alle Felder korrekt ausfüllen.'
+                })
+                showHideQuotes()
+            }
+            showHideQuotes()
+        }
+
+        function deleteQuote(obj) {
+            const quoteID = obj.RowKey
+                fetch('/quotes/delete/' + quoteID, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded ' },
+                    body: 'key=' + quoteID
+                }).then(response => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Der Eintrag wurde erfolgreich entfernt.'
+                    })
+                }).catch(err => {
+                    console.error(err);
+                })
+                showHideQuotes()
+        }
+
+    </script>
+</head>
+
+<body>
+<img src="https://storage.googleapis.com/sw-sc-de-assets/assets/Logos/SINGLE/WHITE_1L.png" style="width: 400px;height: 100px;margin-top: 1%;">
+</br>
+    <div id="showAll">
+        <script>
+            showHideQuotes()
+        </script>
+    </div>
+</body>
+
+</html>
